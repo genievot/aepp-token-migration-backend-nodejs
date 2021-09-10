@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import {createAdditions} from './controllers/holderController';
-const uri: string = "mongodb://jeevanjot:kjwebrkbwe34523@mongodb.ex-genievot.svc.cluster.local:27017/?authSource=token_holders&readPreference=primary&appname=MongoDB%20Compass&ssl=false";
+const uri: string = "mongodb://jeevanjot:kjwebrkbwe34523@mongodb.ex-genievot.svc.cluster.local:27017/token_holders?authSource=token_holders&readPreference=primary&appname=MongoDB%20Compass&ssl=false";
 
 
 mongoose.connect(uri, (err: any) => {

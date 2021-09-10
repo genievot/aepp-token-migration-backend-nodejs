@@ -26,24 +26,25 @@ export let rootHash = (req: Request, res: Response) => {
 
 
 //Add data to DB!
-
-export async function createAdditions() {
-  for (let index = 0; index < data_to_array.length; index++) {
-    console.log("Adding to db: " + index)
+var i = 0
+export function createAdditions() {
+  if(i < data_to_array.length) {
     var body = {
-      hash: tree.hashFunction(data_to_array[index]),
-      eth_address: data_to_array[index].split(':')[0],
-      balance: data_to_array[index].split(':')[1],
-      leaf_index: index
+      hash: tree.hashFunction(data_to_array[i]),
+      eth_address: data_to_array[i].split(':')[0],
+      balance: data_to_array[i].split(':')[1],
+      leaf_index: i
     }
-    
     var holder = new Holder(body)
 
-    await holder.save((err: any) => {
+    holder.save((err: any) => {
       if(err) {
         console.log(err)
+        i++
       } else {
         console.log(holder)
+        i++
+        createAdditions()
       }
     })
   }
