@@ -55,8 +55,8 @@ export async function migrate(amount, ae_address, leaf_index, siblings, signatur
     _sinatures_in_bytes = []
     _signature = signature
     for (let index = 0; index < 130; index = index + 2) {
-      if (decodedResult[index] == undefined) {
-        _sinatures_in_bytes.push("0x" + 00)
+      if (_signature[index] == undefined) {
+        _sinatures_in_bytes.push("0x" + "00")
         continue
       }
       const element = _signature[index].toString(16);
