@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
 import Holder from './../holders';
 
-import MerkleTree from '../createMerkleTree'
-import data from '../data/final-token-holders-sorted.json'
+import MerkleTree from '../createMerkleTree';
+import * as ae from '../aeternitySdk';
+import data from '../data/final-token-holders-sorted.json';
+
 
 
 var data_to_array: string[] = []
 data_to_array = Object.entries(data).map((e) => ( JSON.stringify({ [e[0]]: e[1] }).replace(/{|}|"/g, '').toUpperCase()));
 var tree = new MerkleTree(data_to_array)
+ae.initNode()
 
 
 
@@ -25,12 +28,13 @@ export let rootHash = (req: Request, res: Response) => {
 }
 export let getInfoByEthAddress = async (req: Request, res: Response) => {
   
-    let holder = Holder.find({eth_address: req.params.ethAddress.toUpperCase()}, (err: any, holder: any) => {
+    let holder = Holder.find({eth_address: req.params.ethAddress.toUpperCase()}, async (err: any, holder: any) => {
       if (err) {
       res.send(err)
     } else {
       try {
-        var migrated = {'migrated': false, "migrateTxHash": "th_"}
+        var is_migrated = await ae.checkMigrated(holder[0]._doc.eth_address)
+        var migrated = {'migrated': is_migrated, "migrateTxHash": "th_"}
         var holder_obj = {...holder[0]._doc, ...migrated}
         delete holder_obj.__v;
         delete holder_obj._id;
