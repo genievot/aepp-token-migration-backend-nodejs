@@ -27,8 +27,7 @@ export const holderSchema = new mongoose.Schema({
   balance: { type: String, required: false },
   leaf_index: { type: Number, required: true },
   // migrated: [{ type: Boolean, required: true }], // check from contract
-  ae_address: { type: String, required: false},
-  migrate_tx_hash: { type: String, required: false }
+  ae_address: { type: String, required: false}
 });
 
 const Holder = mongoose.model('Holder', holderSchema);

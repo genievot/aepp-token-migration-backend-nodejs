@@ -65,11 +65,20 @@ export let getHashByIndex = (req: Request, res: Response) => {
 export let getSiblingsByIndex = (req: Request, res: Response) => {
     return res.send({"status": true, "hashes": tree.getProof(data_to_array[Number(req.params.index)])});
 }
-export let validateRequest = (req: Request, res: Response) => {
-  return res.send({"status": true, "tree": {"root": tree.getRootHash(), "length": tree.leaves.length}});
+
+export let validateRequest = async (req: Request, res: Response) => {
+  console.log("validate Request")
+  console.log(req.body.ethAddress)
+  console.log(req.body.balance)
+  console.log(req.body.index)
+  console.log(req.body.hashes)
+  let validated = await ae.validateValues(req.body.ethAddress, req.body.balance, req.body.index, req.body.hashes)
+  res.send({"status": true, "exists": validated});
 }
-export let migrate = (req: Request, res: Response) => {
-  return res.send({"status": true, "tree": {"root": tree.getRootHash(), "length": tree.leaves.length}});
+
+export let migrate = async (req: Request, res: Response) => {
+  let result = await ae.migrate(req.body.amount, req.body.ae_address, req.body.leaf_index, req.body.siblings, req.body.signature)
+  res.send({"status": true, "result": result});
 }
 
 // For additionals purposes...
