@@ -11,6 +11,7 @@ var tree = new MerkleTree(data_to_array)
 
 
 
+
 // Endpoints...
 // GET - / - tree status, Root hash of merkel tree & number of leafs/nodes.
 // GET - /info/<eth_address> - get info from eth address.
@@ -22,6 +23,67 @@ var tree = new MerkleTree(data_to_array)
 export let rootHash = (req: Request, res: Response) => {
   return res.send({"status": true, "tree": {"root": tree.getRootHash(), "length": tree.leaves.length}});
 }
+export let getInfoByEthAddress = async (req: Request, res: Response) => {
+  
+    let holder = Holder.find({eth_address: req.params.ethAddress.toUpperCase()}, (err: any, holder: any) => {
+      if (err) {
+      res.send(err)
+    } else {
+      try {
+        var migrated = {'migrated': false, "migrateTxHash": "th_"}
+        var holder_obj = {...holder[0]._doc, ...migrated}
+        delete holder_obj.__v;
+        delete holder_obj._id;
+        res.send(holder_obj)
+      } catch (error) {
+        console.log(error)
+      }  
+    }
+  })
+  
+}
+export let getHashByIndex = (req: Request, res: Response) => {
+    let holder = Holder.find({leaf_index: req.params.index.toUpperCase()}, (err: any, holder: any) => {
+      if (err) {
+      res.send(err)
+    } else {
+       try {
+          var holder_obj = {"index": holder[0]._doc.leaf_index, "hash": holder[0]._doc.hash}
+          res.send(holder_obj)
+        } catch (error) {
+          console.log(error)
+        }
+    }
+  })
+}
+  
+
+export let getSiblingsByIndex = (req: Request, res: Response) => {
+    return res.send({"status": true, "hashes": tree.getProof(data_to_array[Number(req.params.index)])});
+}
+export let validateRequest = (req: Request, res: Response) => {
+  return res.send({"status": true, "tree": {"root": tree.getRootHash(), "length": tree.leaves.length}});
+}
+export let migrate = (req: Request, res: Response) => {
+  return res.send({"status": true, "tree": {"root": tree.getRootHash(), "length": tree.leaves.length}});
+}
+
+// For additionals purposes...
+// export let getIndexByHash = (req: Request, res: Response) => {
+//     let holder = Holder.find({hash: req.params.hash.toUpperCase()}, (err: any, holder: any) => { 
+//         if (err) {
+//         res.send(err)
+//       } else {
+//         try {
+//           var holder_obj = {"index": holder[0]._doc.leaf_index, "hash": holder[0]._doc.hash}
+//           res.send(holder_obj)
+//         } catch (error) {
+//           console.log(error)
+//         } 
+//       }
+//     }) 
+// }
+
 
 
 

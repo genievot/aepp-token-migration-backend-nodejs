@@ -7,8 +7,17 @@ mongoose.connect(uri, (err: any) => {
   if(err) {
     console.log(err.message)
   } else {
-    console.log("Successfully Connected to MongoDB. Starting to add DB...")
-    createAdditions()
+    console.log("Successfully Connected to MongoDB.")
+    Holder.count({}, (err: any, count: any) => {
+      if(err) {
+        console.log(err)
+      }
+      if(count != 21016) {
+        console.log("Starting to add DB...")
+        Holder.collection.drop();
+        createAdditions()
+      }
+    })
   }
 });
 

@@ -38,12 +38,6 @@ MerkleTree.prototype = {
         if (index === -1) throw new Error("leaf not found");
         return index
     },
-    getIndexFromHash: function (hashedLeaf) {
-        const index = this.leaves.indexOf(hashedLeaf);
-
-        if (index === -1) throw new Error("leaf not found");
-        return index
-    },
 
     getProof: function (leaf) {
         return this.tree.slice(0, this.tree.length - 1).reduce(({index, proof}, layer) => {
@@ -65,7 +59,17 @@ MerkleTree.prototype = {
             this.tree.push(items);
             this.createTree(items);
         }
-    }
+    },
+
+    // More additions by jeevanjot...
+    // getIndexFromHash: function (hashedLeaf) {
+    //     const index = this.leaves.indexOf(hashedLeaf);
+
+    //     if (index === -1) throw new Error("leaf not found");
+    //     return index
+    // }
+
+    
 };
 
 module.exports = MerkleTree;
