@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 import {createAdditions} from './controllers/holderController';
-const uri: string = "mongodb://jeevanjot:kjwebrkbwe34523@mongodb.ex-genievot.svc.cluster.local:27017/token_holders?authSource=token_holders&readPreference=primary&appname=MongoDB%20Compass&ssl=false";
+
+import * as dotenv from "dotenv";
+dotenv.config({ path: __dirname+'/.env' });
+
+const uri: string =  <string>process.env.DB_URL
 
 
 mongoose.connect(uri, (err: any) => {

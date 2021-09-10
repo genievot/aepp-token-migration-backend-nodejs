@@ -40,7 +40,7 @@ export let getInfoByEthAddress = async (req: Request, res: Response) => {
         delete holder_obj._id;
         res.send(holder_obj)
       } catch (error) {
-        console.log(error)
+        console.trace(error)
       }  
     }
   })
@@ -55,7 +55,7 @@ export let getHashByIndex = (req: Request, res: Response) => {
           var holder_obj = {"index": holder[0]._doc.leaf_index, "hash": holder[0]._doc.hash}
           res.send(holder_obj)
         } catch (error) {
-          console.log(error)
+          console.trace(error)
         }
     }
   })
@@ -114,10 +114,10 @@ export function createAdditions() {
 
     holder.save((err: any) => {
       if(err) {
-        console.log(err)
+        console.trace(err)
         i++
       } else {
-        console.log(holder)
+        console.trace(holder)
         i++
         createAdditions()
       }
