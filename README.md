@@ -17,6 +17,7 @@ PUBLIC_KEY=ak_2H4....
 - Get the migration contract address `ct_eJhrbPPS4V97VLKEVbSCJFpdA4uyXiZujQyLqMFoYV88TzDe6` or [deploy your own](https://github.com/aeternity/aepp-token-migration-smart-contract/blob/master/contracts/TokenMigration.aes) and add the address in the above **env's CONTRACT_ADDRESS** variable
 - Use the Node url for Mainnet (`https://mainnet.aeternity.io`) or Testnet (`https://testnet.aeternity.io`) according to your interactive environment (contract deployment etc.) and add the url to the above **env file**
 - Create a set of public and private keys using [aecli](https://github.com/aeternity/aepp-cli-js) or any tool you like and add it in the above **env file**
+- I used `node 14` while working on this project. To avoid any breaking in code with current `tsconfig.json` you can use the same version.
 
 ### Run the script from _src_ directory
 Inside **src** directory, Run `npm run dev`, This will use **nodemon** to run the typescript with `app.ts` as entrypoint.
