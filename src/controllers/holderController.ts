@@ -34,10 +34,14 @@ export let getInfoByEthAddress = async (req: Request, res: Response) => {
     } else {
       try {
         var is_migrated = await ae.checkMigrated(holder[0]._doc.eth_address)
-        var migrated = {'migrated': is_migrated, "migrateTxHash": "th_"}
-        var holder_obj = {...holder[0]._doc, ...migrated}
-        delete holder_obj.__v;
-        delete holder_obj._id;
+        var migrated = {'migrated': is_migrated}
+        var _obj = {
+          "index": holder[0]._doc.leaf_index,
+          "hash": holder[0]._doc.hash,
+          "tokens": holder[0]._doc.balance,
+          "migrateTxHash": holder[0]._doc.migrateTxHash
+        }
+        var holder_obj = {..._obj, ...migrated}
         res.send(holder_obj)
       } catch (error) {
         console.trace(error)
@@ -78,6 +82,11 @@ export let validateRequest = async (req: Request, res: Response) => {
 
 export let migrate = async (req: Request, res: Response) => {
   let result = await ae.migrate(req.body.amount, req.body.ae_address, req.body.leaf_index, req.body.siblings, req.body.signature)
+  await Holder.findOneAndUpdate({
+    leaf_index: req.body.leaf_index
+  }, {
+    migrateTxHash: result
+  })
   res.send({"status": true, "result": result});
 }
 
@@ -108,7 +117,8 @@ export function createAdditions() {
       hash: tree.hashFunction(data_to_array[i]),
       eth_address: data_to_array[i].split(':')[0],
       balance: data_to_array[i].split(':')[1],
-      leaf_index: i
+      leaf_index: i,
+      migrateTxHash: ''
     }
     var holder = new Holder(body)
 

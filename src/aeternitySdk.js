@@ -64,10 +64,8 @@ export async function migrate(amount, ae_address, leaf_index, siblings, signatur
       _sinatures_in_bytes.push("0x" + element + element2)
     }
     console.log(_sinatures_in_bytes)
-
-
     var result = await contract.methods.migrate(amount, ae_address, leaf_index, siblings, _sinatures_in_bytes)
-    return result.decodedResult
+    return result.hash
   } catch(e) {
     console.trace(e)
   }
