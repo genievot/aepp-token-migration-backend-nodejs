@@ -5,7 +5,7 @@ import MerkleTree from '../createMerkleTree';
 import * as ae from '../aeternitySdk';
 import data from '../data/final-token-holders-sorted.json';
 
-
+console.log(Holder)
 
 var data_to_array: string[] = []
 data_to_array = Object.entries(data).map((e) => ( JSON.stringify({ [e[0]]: e[1] }).replace(/{|}|"/g, '').toUpperCase()));
@@ -28,46 +28,51 @@ export let rootHash = (req: Request, res: Response) => {
 }
 export let getInfoByEthAddress = async (req: Request, res: Response) => {
   
-    let holder = Holder.find({eth_address: req.params.ethAddress.toUpperCase()}, async (err: any, holder: any) => {
-      if (err) {
-      res.send(err)
-    } else {
+    let holder = Holder.findOne({where: {eth_address: req.params.ethAddress.toUpperCase()}}).then(async (holder: any) => {
       try {
-        var is_migrated = await ae.checkMigrated(holder[0]._doc.eth_address)
+        var is_migrated = await ae.checkMigrated(holder.dataValues.eth_address)
         var migrated = {'migrated': is_migrated}
         var _obj = {
-          "index": holder[0]._doc.leaf_index,
-          "hash": holder[0]._doc.hash,
-          "tokens": holder[0]._doc.balance,
-          "migrateTxHash": holder[0]._doc.migrateTxHash
+          "index": holder.dataValues.leaf_index,
+          "hash": holder.dataValues.hash,
+          "tokens": holder.dataValues.balance,
+          "migrateTxHash": holder.dataValues.migrateTxHash
         }
         var holder_obj = {..._obj, ...migrated}
         res.send(holder_obj)
       } catch (error) {
         console.trace(error)
       }  
-    }
-  })
+    }).catch((e: any) => {
+      console.trace(e)
+    })
   
 }
 export let getHashByIndex = (req: Request, res: Response) => {
-    let holder = Holder.find({leaf_index: req.params.index.toUpperCase()}, (err: any, holder: any) => {
-      if (err) {
-      res.send(err)
-    } else {
-       try {
-          var holder_obj = {"index": holder[0]._doc.leaf_index, "hash": holder[0]._doc.hash}
-          res.send(holder_obj)
-        } catch (error) {
-          console.trace(error)
-        }
+    let holder = Holder.findOne({where: {leaf_index: req.params.index}}).then((holder: any) => {
+    try {
+      var holder_obj = {"index": holder.dataValues.leaf_index, "hash": holder.dataValues.hash}
+      res.send(holder_obj)
+    } catch (error) {
+      console.trace(error)
     }
-  })
+    }).catch((e: any) => {
+      console.trace(e)
+    })
 }
   
 
 export let getSiblingsByIndex = (req: Request, res: Response) => {
-    return res.send({"status": true, "hashes": tree.getProof(data_to_array[Number(req.params.index)])});
+    let holder = Holder.findOne({where: {leaf_index: req.params.index}}).then((holder: any) => {
+    try {
+      var holder_obj = {"status": true, "hashes": holder.dataValues.siblings}
+      res.send(holder_obj)
+    } catch (error) {
+      console.trace(error)
+    }
+    }).catch((e: any) => {
+      console.trace(e)
+    })
 }
 
 export let validateRequest = async (req: Request, res: Response) => {
@@ -81,57 +86,64 @@ export let validateRequest = async (req: Request, res: Response) => {
 }
 
 export let migrate = async (req: Request, res: Response) => {
-  let result = await ae.migrate(req.body.amount, req.body.ae_address, req.body.leaf_index, req.body.siblings, req.body.signature)
-  await Holder.findOneAndUpdate({
-    leaf_index: req.body.leaf_index
-  }, {
-    migrateTxHash: result
-  })
+  let userValues = await get_user_by_eth_pk(req.body.ethPubKey)
+  let result = await ae.migrate(userValues.balance, req.body.aeAddress, userValues.leaf_index, userValues.siblings, req.body.signature)
+  try {
+    await Holder.update({
+      migrateTxHash: result
+    }, {
+      where: {leaf_index: userValues.leaf_index}
+    })
+  } catch(e) {
+    console.trace(e)
+  }
   res.send({"status": true, "result": result});
 }
 
-// For additionals purposes...
-// export let getIndexByHash = (req: Request, res: Response) => {
-//     let holder = Holder.find({hash: req.params.hash.toUpperCase()}, (err: any, holder: any) => { 
-//         if (err) {
-//         res.send(err)
-//       } else {
-//         try {
-//           var holder_obj = {"index": holder[0]._doc.leaf_index, "hash": holder[0]._doc.hash}
-//           res.send(holder_obj)
-//         } catch (error) {
-//           console.log(error)
-//         } 
-//       }
-//     }) 
-// }
+// // For additionals purposes...
+// // export let getIndexByHash = (req: Request, res: Response) => {
+// //     let holder = Holder.find({hash: req.params.hash.toUpperCase()}, (err: any, holder: any) => { 
+// //         if (err) {
+// //         res.send(err)
+// //       } else {
+// //         try {
+// //           var holder_obj = {"index": holder[0]._doc.leaf_index, "hash": holder[0]._doc.hash}
+// //           res.send(holder_obj)
+// //         } catch (error) {
+// //           console.log(error)
+// //         } 
+// //       }
+// //     }) 
+// // }
 
+
+
+
+// Find user by eth id
+async function get_user_by_eth_pk(_eth_address: String) {
+  let user = await Holder.findOne({ where: { eth_address: _eth_address  } })
+  return user.dataValues
+}
 
 
 
 //Add data to DB!
 var i = 0
-export function createAdditions() {
+export async function createAdditions() {
   if(i < data_to_array.length) {
     var body = {
       hash: tree.hashFunction(data_to_array[i]),
       eth_address: data_to_array[i].split(':')[0],
       balance: data_to_array[i].split(':')[1],
+      siblings: tree.getProof(data_to_array[i]),
       leaf_index: i,
       migrateTxHash: ''
     }
     var holder = new Holder(body)
 
-    holder.save((err: any) => {
-      if(err) {
-        console.trace(err)
-        i++
-      } else {
-        console.trace(holder)
-        i++
-        createAdditions()
-      }
-    })
+    console.log(await holder.save())
+    i++
+    createAdditions()
   }
 }
 
