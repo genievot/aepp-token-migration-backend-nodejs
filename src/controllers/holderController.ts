@@ -3,7 +3,9 @@ import Holder from './../holders';
 
 import MerkleTree from '../createMerkleTree';
 import * as ae from '../aeternitySdk';
-import data from '../data/final-token-holders-sorted.json';
+
+// import data from '../data/final-token-holders-sorted.json';
+import data from '../data/final-token-holders-sorted-test.json';
 
 console.log(Holder)
 

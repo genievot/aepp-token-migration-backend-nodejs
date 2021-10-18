@@ -2,7 +2,7 @@ import express from "express";
 import * as holderController from './controllers/holderController';
 
 const app = express();
-var port = 3000;
+var port = 3002;
 
 // console.log(holderController.rootHash)
 app.get('/', holderController.rootHash);

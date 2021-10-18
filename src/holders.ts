@@ -10,7 +10,6 @@ const sequelize = new Sequelize(<string>process.env.DB_URL)
 
 console.log("going to connect...")
 
-
 const Holder = sequelize.define(process.env.TABLE_NAME, {
   hash: { type: Sequelize.STRING, allowNull: false },
   eth_address: { type: Sequelize.STRING, allowNull: false},
@@ -23,7 +22,7 @@ const Holder = sequelize.define(process.env.TABLE_NAME, {
 });
 
 // const Holder = mongoose.model('Holder', holderSchema);
-Holder.sync({force: false});
+
 sequelize.authenticate().then(() => {
   console.log('Connection has been established successfully.');
    Holder.count({}).then(async (c:any) => {
@@ -33,7 +32,7 @@ sequelize.authenticate().then(() => {
     }
    }).catch((err: any) => {
       console.trace(err)
-      console.log("Making database and adding entries...")
+      console.log("Making table and adding entries...")
       createAdditions()
    })
   // createAdditions()
@@ -60,4 +59,6 @@ sequelize.authenticate().then(() => {
 //     })
 //   }
 // });
+
+Holder.sync({force: true});
 export default Holder;
