@@ -5,6 +5,7 @@ Install all dependencies with `npm i` or `yarn`.
 ### Inside _src_ directory, create `.env` file and add your values for these variables inside env file.
 ```
 DB_URL=mongodb://jeevanjot:kjweb....
+TABLE_NAME = <table_name>
 COMPILER_URL=https://latest.compiler.aepps.com
 CONTRACT_ADDRESS=ct_eJhrb....
 NODE_URL=https://mainnet.aeternity.io
@@ -13,7 +14,7 @@ PUBLIC_KEY=ak_2H4....
 ```
 
 ### Requirements
-- Setup `MongoDB` and use your connection string for above **env's First variable**
+- Setup `Postgres DB` and use your connection string for above **env's First variable**
 - Get the migration contract address `ct_eJhrbPPS4V97VLKEVbSCJFpdA4uyXiZujQyLqMFoYV88TzDe6` or [deploy your own](https://github.com/aeternity/aepp-token-migration-smart-contract/blob/master/contracts/TokenMigration.aes) and add the address in the above **env's CONTRACT_ADDRESS** variable
 - Use the Node url for Mainnet (`https://mainnet.aeternity.io`) or Testnet (`https://testnet.aeternity.io`) according to your interactive environment (contract deployment etc.) and add the url to the above **env file**
 - Create a set of public and private keys using [aecli](https://github.com/aeternity/aepp-cli-js) or any tool you like and add it in the above **env file**

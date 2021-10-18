@@ -100,24 +100,6 @@ export let migrate = async (req: Request, res: Response) => {
   res.send({"status": true, "result": result});
 }
 
-// // For additionals purposes...
-// // export let getIndexByHash = (req: Request, res: Response) => {
-// //     let holder = Holder.find({hash: req.params.hash.toUpperCase()}, (err: any, holder: any) => { 
-// //         if (err) {
-// //         res.send(err)
-// //       } else {
-// //         try {
-// //           var holder_obj = {"index": holder[0]._doc.leaf_index, "hash": holder[0]._doc.hash}
-// //           res.send(holder_obj)
-// //         } catch (error) {
-// //           console.log(error)
-// //         } 
-// //       }
-// //     }) 
-// // }
-
-
-
 
 // Find user by eth id
 async function get_user_by_eth_pk(_eth_address: String) {
@@ -148,28 +130,3 @@ export async function createAdditions() {
 }
 
 
-
-// logs
-
-
-
-
-// console.log("data_to_array--")
-// console.log(data_to_array)
-// console.log("data_to_array length--")
-
-
-// var values = Object.values(data);
-// var sumValues = 0
-// for (let index = 0; index < values.length; index++) {
-//   // console.log(index)
-//   sumValues = BigInt(values[index]) + (sumValues+'n');
-// }
-// console.log("sumValues--")
-// console.log(sumValues)
-// console.log("Get Tree--")
-// console.log(tree.getTree())
-// console.log("Get Root Hash--")
-// console.log(tree.getRootHash())
-// console.log("Get Index--")
-// console.log(tree.getIndexFromHash('310E3A573B9299000F054D25F0D301CD314C081E4C4E03E8CC07B660B8B4CC95'))

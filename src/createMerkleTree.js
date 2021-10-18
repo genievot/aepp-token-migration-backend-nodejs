@@ -2,15 +2,10 @@ const createKeccakHash = require('keccak')
 
 var hash = (leaf) => {
     var hash = createKeccakHash("keccak256").update(leaf).digest('hex').toUpperCase()
-    // if(leaf.includes("0X932CF9910672B8A26BD31141FF8F11E9B7DFA6E2")){ // For Manual checks
-    //     console.log(leaf)
-    //     console.log(hash)
-    // }
     return hash
 }
 
 function MerkleTree(leaves) {
-    // console.trace(leaves)
     this.hashFunction = hash;
     this.leaves = this.hashLeaves(leaves);
     this.tree = [this.leaves];
@@ -60,14 +55,6 @@ MerkleTree.prototype = {
             this.createTree(items);
         }
     },
-
-    // More additions by jeevanjot...
-    // getIndexFromHash: function (hashedLeaf) {
-    //     const index = this.leaves.indexOf(hashedLeaf);
-
-    //     if (index === -1) throw new Error("leaf not found");
-    //     return index
-    // }
 
     
 };
