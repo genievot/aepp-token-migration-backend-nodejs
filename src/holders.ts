@@ -1,43 +1,52 @@
+import * as dotenv from 'dotenv'
+dotenv.config({ path: __dirname+'/.env' })
 const Sequelize = require('sequelize')
-import {createAdditions} from './controllers/holderController';
 
-import * as dotenv from "dotenv";
-dotenv.config({ path: __dirname+'/.env' });
+import {importHolders} from './controllers/holderController'
+import logger from './logger'
 
-const sequelize = new Sequelize(<string>process.env.DB_URL)
+const sequelize = new Sequelize(<string>process.env.DB_URL, {
+  logging: false
+})
 
-console.log("going to connect...")
-
-
-const Holder = sequelize.define(process.env.TABLE_NAME, {
-  hash: { type: Sequelize.STRING, allowNull: false },
-  eth_address: { type: Sequelize.STRING, allowNull: false},
-  balance: { type: Sequelize.STRING, allowNull: true },
-  siblings : { type: Sequelize.ARRAY(Sequelize.TEXT), allowNull: false},
-  leaf_index: { type: Sequelize.INTEGER, allowNull: false },
-  ae_address: { type: Sequelize.STRING, allowNull: true},
-  migrateTxHash : { type: Sequelize.STRING, allowNull: true}
-});
+const Holder = sequelize.define(process.env.TABLE_NAME,
+  {
+    hash: { type: Sequelize.STRING, allowNull: false },
+    eth_address: { type: Sequelize.STRING, allowNull: false},
+    balance: { type: Sequelize.STRING, allowNull: true },
+    siblings : { type: Sequelize.ARRAY(Sequelize.TEXT), allowNull: false},
+    leaf_index: { type: Sequelize.INTEGER, allowNull: false },
+    ae_address: { type: Sequelize.STRING, allowNull: true},
+    migrateTxHash : { type: Sequelize.STRING, allowNull: true}
+  },
+  {
+    freezeTableName: true,
+    tableName: process.env.TABLE_NAME
+  }
+);
 
 Holder.sync({force: false});
-sequelize.authenticate().then(() => {
-  console.log('Connection has been established successfully.');
-   Holder.count({}).then(async (c:any) => {
-     console.log("Current count in DB is: " + c)
-    if(c != 21016) {
-       console.log("Current count is not correct, Please delete your Table then run this script again.!")
+sequelize.authenticate().then(async () => {
+  logger.info('Connection has been established successfully.')
+  let entryCount;
+  try {
+    entryCount = await Holder.count({})
+    if (entryCount === 0) {
+      logger.info('Empty table. Data import required.')
+      logger.info('BEGIN: Import data.')
+      await importHolders()
+      logger.info('COMPLETE: Import data.')
+    } else {
+      if (entryCount != 21016) {
+        throw new Error('Incorrect dataset. Please delete your database table then restart the application.')
+      }
     }
-   }).catch((err: any) => {
-      console.trace(err)
-      console.log("Making database and adding entries...")
-      createAdditions()
-   })
-
-  }).catch((err: any) => {
-    console.trace(err)
-    console.error('Unable to connect to the database:', err);
-  });
-
-
+  } catch(e) {
+    logger.warn('Database does not exist. Creating database.')
+    logger.info('BEGIN: Import data.')
+    await importHolders()
+    logger.info('COMPLETE: Import data.')
+  }
+})
 
 export default Holder;

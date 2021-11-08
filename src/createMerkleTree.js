@@ -56,7 +56,6 @@ MerkleTree.prototype = {
         }
     },
 
-    
 };
 
 module.exports = MerkleTree;
